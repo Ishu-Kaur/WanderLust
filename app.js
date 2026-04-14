@@ -40,13 +40,11 @@ app.use(methodOverride("_method"));
 app.engine("ejs",ejsMate);
 app.use(express.static(path.join(__dirname,"/public")));
 
-const store = MongoStore.default ? MongoStore.default.create({
+const store = (MongoStore.default ? MongoStore.default : MongoStore).create({
     mongoUrl: dbUrl,
-    crypto: { secret: process.env.SECRET },
-    touchAfter: 24 * 3600,
-}) : MongoStore.create({
-    mongoUrl: dbUrl,
-    crypto: { secret: process.env.SECRET },
+    crypto: {
+        secret: "mysupersecretcode"
+    },
     touchAfter: 24 * 3600,
 });
 
