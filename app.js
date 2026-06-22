@@ -1,3 +1,7 @@
+// 1. FIX THE NODE DNS BUG (Add this at the absolute top of app.js)
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+
 if(process.env.NODE_ENV != "production"){
     require("dotenv").config();
 }
@@ -20,8 +24,8 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
-// Explicit direct string format that bypasses Node's broken SRV DNS lookup
-const dbUrl = process.env.ATLASDB_URL || "mongodb://theishukaur_db_user:OReE6yaGYqZJ4dJQ@cluster0-shard-00-00.fquwuby.mongodb.net:27017,cluster0-shard-00-01.fquwuby.mongodb.net:27017,cluster0-shard-00-02.fquwuby.mongodb.net:27017/wanderlust?ssl=true&replicaSet=atlas-kvn9z8-shard-0&authSource=admin&retryWrites=true&w=majority";
+// Clean environment connection string
+const dbUrl = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust";
 
 async function main(){
     await mongoose.connect(dbUrl);
@@ -94,7 +98,6 @@ app.use((err, req, res, next)=>{
     res.status(statusCode).render("error.ejs", { message });
 });
 
-// FIX: Listen to the port dynamically assigned by Render in production
 const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`server is listening to port ${port}`);
