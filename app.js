@@ -21,7 +21,8 @@ const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
 // Fallback to local DB if production env variable fails to load
-const dbUrl = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust";
+// Hardcoded test string to verify cluster connectivity
+const dbUrl = "mongodb+srv://theishukaur_db_user:OReE6yaGYqZJ4dJQ@cluster0.fquwuby.mongodb.net/wanderlust?appName=Cluster0";
 
 async function main(){
     await mongoose.connect(dbUrl);
