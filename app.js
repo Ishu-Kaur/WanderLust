@@ -20,7 +20,8 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
-const dbUrl = process.env.ATLASDB_URL;
+// Fallback to local DB if production env variable fails to load
+const dbUrl = process.env.ATLASDB_URL || "mongodb://127.0.0.1:27017/wanderlust";
 
 async function main(){
     await mongoose.connect(dbUrl);
@@ -30,7 +31,7 @@ main().then(()=>{
     console.log("connected to DB");
     })
     .catch(err =>{
-        console.log(err);
+        console.log("Database connection error: ", err);
     });
 
 app.set("view engine" , "ejs");
@@ -43,7 +44,7 @@ app.use(express.static(path.join(__dirname,"/public")));
 const store = (MongoStore.default ? MongoStore.default : MongoStore).create({
     mongoUrl: dbUrl,
     crypto: {
-        secret: "mysupersecretcode"
+        secret: process.env.SECRET || "mysupersecretcode"
     },
     touchAfter: 24 * 3600,
 });
@@ -54,7 +55,7 @@ store.on("error",(err)=>{
 
 const sessionOptions={
     store,
-    secret: "mysupersecretcode",
+    secret: process.env.SECRET || "mysupersecretcode",
     resave: false,
     saveUninitialized: true,
     cookie:{
@@ -63,10 +64,6 @@ const sessionOptions={
         httpOnly: true
     },
 };
-
-// app.get("/",(req,res)=>{
-//     res.send("Hi, I am root");
-// });
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -84,15 +81,6 @@ app.use((req,res,next)=>{
     next();
 });
 
-// app.get("/demouser", async (req , res)=>{
-//     let fakeUser = new User({
-//         email: "student@gmail.com",
-//         username : "delta-student"
-//     });
-//     let registeredUser = await User.register(fakeUser,"helloworld");
-//     res.send(registeredUser);
-// });
-
 app.use("/listings",listingRouter);
 app.use("/listings/:id/reviews",reviewRouter);
 app.use("/", userRouter);
@@ -104,9 +92,10 @@ app.all("*path",(req, res, next)=>{
 app.use((err, req, res, next)=>{
     let {statusCode = 500, message ="Something went wrong!"} = err;
     res.status(statusCode).render("error.ejs", { message });
-    // res.status(statusCode).send(message);
 });
 
-app.listen(8080,()=>{
-    console.log("server is listening to port 8080");
+// FIX: Listen to the port dynamically assigned by Render in production
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
+    console.log(`server is listening to port ${port}`);
 });
