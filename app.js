@@ -20,9 +20,8 @@ const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
-// Fallback to local DB if production env variable fails to load
-// Hardcoded test string to verify cluster connectivity
-const dbUrl = "mongodb+srv://theishukaur_db_user:OReE6yaGYqZJ4dJQ@cluster0.fquwuby.mongodb.net/wanderlust?appName=Cluster0";
+// Explicit direct string format that bypasses Node's broken SRV DNS lookup
+const dbUrl = process.env.ATLASDB_URL || "mongodb://theishukaur_db_user:OReE6yaGYqZJ4dJQ@cluster0-shard-00-00.fquwuby.mongodb.net:27017,cluster0-shard-00-01.fquwuby.mongodb.net:27017,cluster0-shard-00-02.fquwuby.mongodb.net:27017/wanderlust?ssl=true&replicaSet=atlas-kvn9z8-shard-0&authSource=admin&retryWrites=true&w=majority";
 
 async function main(){
     await mongoose.connect(dbUrl);
