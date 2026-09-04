@@ -90,16 +90,17 @@ app.get("/", (req, res) => {
     res.redirect("/listings");
 });
 
-app.use("/listings",listingRouter);
-app.use("/listings/:id/reviews",reviewRouter);
+app.use("/listings", listingRouter);
+app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
-app.all("*", (req, res, next) => {
+// Use named parameter *path to prevent path-to-regexp parsing errors
+app.all("*path", (req, res, next) => {
     next(new ExpressError(404, "Page Not Found!"));
 });
 
-app.use((err, req, res, next)=>{
-    let {statusCode = 500, message ="Something went wrong!"} = err;
+app.use((err, req, res, next) => {
+    let { statusCode = 500, message = "Something went wrong!" } = err;
     res.status(statusCode).render("error.ejs", { message });
 });
 
