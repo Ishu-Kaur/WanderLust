@@ -85,11 +85,16 @@ app.use((req,res,next)=>{
     next();
 });
 
+// Redirect root path directly to /listings
+app.get("/", (req, res) => {
+    res.redirect("/listings");
+});
+
 app.use("/listings",listingRouter);
 app.use("/listings/:id/reviews",reviewRouter);
 app.use("/", userRouter);
 
-app.all("*path",(req, res, next)=>{
+app.all("*", (req, res, next) => {
     next(new ExpressError(404, "Page Not Found!"));
 });
 
