@@ -1,7 +1,4 @@
 // 1. FIX THE NODE DNS BUG (Add this at the absolute top of app.js)
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first');
-
 if(process.env.NODE_ENV != "production"){
     require("dotenv").config();
 }
